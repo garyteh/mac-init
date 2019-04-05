@@ -120,6 +120,9 @@ brew install ack \
     xmlstarlet \
     xz 
 
+echo "Homebrew formula post installations..."
+PERL_MM_OPT="INSTALL_BASE=$HOME/perl5" cpan local::lib
+
 echo "Set up vundle for vim..."
 mkdir -p ~/.vim/bundle/
 git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
