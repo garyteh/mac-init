@@ -19,7 +19,9 @@ if ! which brew &> /dev/null; then
     /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 fi
 
-brew install apr \
+echo "Installing Homebrew formulas..."
+brew install ack \
+    apr \
     apr-util \
     autoconf \
     awscli \
@@ -55,6 +57,7 @@ brew install apr \
     jq \
     kubernetes-cli \
     kubernetes-helm \
+    ldns \
     less \
     libevent \
     libffi \
@@ -65,6 +68,9 @@ brew install apr \
     libtasn1 \
     libunistring \
     libyaml \
+    lua \
+    lua@5.1 \
+    luarocks \
     lynx \
     lz4 \
     lzip \
@@ -104,6 +110,7 @@ brew install apr \
     terraform \
     tmux \
     tree \
+    unbound \
     unzip \
     utf8proc \
     vim \
@@ -112,3 +119,4 @@ brew install apr \
     wget \
     xmlstarlet \
     xz 
+
