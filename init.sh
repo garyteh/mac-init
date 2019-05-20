@@ -33,6 +33,7 @@ brew install ack \
     cython \
     diffutils \
     emacs \
+    expect \
     file-formula \
     findutils \
     gawk \
@@ -47,6 +48,7 @@ brew install ack \
     gnu-time \
     gnu-which \
     gnutls \
+    go \
     gpatch \
     gradle-completion \
     grep \
