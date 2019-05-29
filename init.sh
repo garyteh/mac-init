@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
+IFS=$'\n\t'
 
-readonly LOG_FILE="/var/log/init.log"
-touch "$LOG_FILE"
-
+LOG_FILE=$(mktemp)
 exec > >(tee -a "$LOG_FILE") 2>&1
+
+echo "Log @ ${LOG_FILE}"
 
 if [[ ! -e "/Library/Developer/CommandLineTools/usr/bin/git" ]]; then
     echo "Installing Xcode Command Line Tool..."
@@ -128,3 +129,20 @@ PERL_MM_OPT="INSTALL_BASE=$HOME/perl5" cpan local::lib
 echo "Set up vundle for vim..."
 mkdir -p ~/.vim/bundle/
 git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+
+echo "Installing application using brew-cask..."
+brew cask install google-chrome \
+    android-file-transfer \
+    appcleaner \
+    authy \
+    docker \
+    dropbox \
+    fluor \
+    iina \
+    iterm2 \
+    lastpass \
+    spotify \
+    sublime-text \
+    visual-studio-code \
+    intellij-idea \
+    whatsapp 
