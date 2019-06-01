@@ -3,8 +3,33 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-LOG_FILE=$(mktemp)
-exec > >(tee -a "$LOG_FILE") 2>&1
+workdir=$(mktemp -d)
+log_file="${workdir}/init.log.$(date +%F%T%Z)"
+exec 19>>"${log_file}"
+export BASH_XTRACEFD="19"
+
+set -x
+
+function __debug {
+    [[ ! -z "${current_command+x}" ]] && last_command=${current_command}
+    current_command=${BASH_COMMAND}
+}
+trap __debug DEBUG
+
+function __exit {
+    last_command_exit_code=$?
+    if [[ ${last_command_exit_code} -ne 0 ]] && [[ ${last_command_exit_code} -ne 130 ]]; then
+        echo "ERROR (${last_command_exit_code}): ${last_command}"
+    fi
+}
+trap __exit EXIT
+
+function __sigint {
+    echo
+    printf "%-30s: %-10s\n" "Last command" "${last_command}"
+    exit 130
+}
+trap __sigint SIGINT
 
 echo "Log @ ${LOG_FILE}"
 
