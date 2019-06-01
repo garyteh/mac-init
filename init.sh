@@ -146,3 +146,9 @@ brew cask install google-chrome \
     visual-studio-code \
     intellij-idea \
     whatsapp 
+
+defaults write NSGlobalDomain KeyRepeat -int 2
+defaults write NSGlobalDomain InitialKeyRepeat -int 15
+defaults write NSGlobalDomain AppleInterfaceStyle -string Dark
+defaults write com.apple.HIToolbox AppleEnabledInputSources -array-add '{"Bundle ID" = "com.apple.inputmethod.TCIM"; InputSourceKind = "Keyboard Input Method";}'
+defaults write com.apple.HIToolbox AppleEnabledInputSources -array-add '{"Bundle ID" = "com.apple.inputmethod.ChineseHandwriting"; InputSourceKind = "Non Keyboard Input Method";}'
