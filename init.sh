@@ -201,6 +201,7 @@ init_macos() {
     defaults delete com.apple.HIToolbox AppleSelectedInputSources
     defaults write com.apple.HIToolbox AppleSelectedInputSources -array-add '<dict> <key>Bundle ID</key> <string>com.apple.PressAndHold</string> <key>InputSourceKind</key> <string>Non Keyboard Input Method</string> </dict>'
     defaults write com.apple.HIToolbox AppleSelectedInputSources -array-add '<dict> <key>InputSourceKind</key> <string>Keyboard Layout</string> <key>KeyboardLayout ID</key> <integer>15</integer> <key>KeyboardLayout Name</key> <string>Australian</string> </dict>'
+    defaults write NSGlobalDomain AppleShowAllExtensions -bool true
 }
 
 echo "Log @ ${log_file}"
