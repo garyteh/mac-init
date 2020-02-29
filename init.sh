@@ -207,9 +207,15 @@ init_macos() {
     defaults write NSGlobalDomain AppleShowAllExtensions -bool true
 }
 
+install_pip() {
+    pip install powerline-status
+    pip install psutil
+}
+
 echo "Log @ ${log_file}"
 install_xcode_command_line_tool
 install_homebrew
 install_homebrew_formulas
 install_homebrew_cask
+install_pip
 init_macos
