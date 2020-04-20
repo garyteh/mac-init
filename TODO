@@ -20,4 +20,6 @@
 - LOG file does not work
 	- should print the LOG file location even it exit unexpectedly
 - pip will not be found because it's not in the PATH yet
-- will break .prompt
+	- will break .prompt
+	- should update to be `pip install --user`
+- install powerline-go
