@@ -19,3 +19,5 @@
 - skip and show warnings to formulas that does not exist anymore
 - LOG file does not work
 	- should print the LOG file location even it exit unexpectedly
+- pip will not be found because it's not in the PATH yet
+- will break .prompt
