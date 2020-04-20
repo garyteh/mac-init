@@ -8,9 +8,10 @@
 - install powerline-fonts
 - switch to latest bash
 - accessibility
-
 - install "The Unarchiver"
 - install java
 - install jenv
     - setup jenv
 - install sdkman
+- determine if Application is installed (not only via brew cask)
+- options to opt-out phases
