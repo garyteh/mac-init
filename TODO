@@ -15,3 +15,5 @@
 - install sdkman
 - determine if Application is installed (not only via brew cask)
 - options to opt-out phases
+- https://serverfault.com/a/663048
+- skip and show warnings to formulas that does not exist anymore
