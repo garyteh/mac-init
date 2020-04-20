@@ -134,7 +134,7 @@ install_homebrew_formulas() {
     ! echo "${installed}" | grep -w 'pkg-config' &> /dev/null && brew install 'pkg-config'
     ! echo "${installed}" | grep -w 'pv' &> /dev/null && brew install 'pv'
     ! echo "${installed}" | grep -w 'python' &> /dev/null && brew install 'python'
-    ! echo "${installed}" | grep -w 'python@2' &> /dev/null && brew install 'python@2'
+    # ! echo "${installed}" | grep -w 'python@2' &> /dev/null && brew install 'python@2'
     ! echo "${installed}" | grep -w 'rbenv' &> /dev/null && brew install 'rbenv'
     ! echo "${installed}" | grep -w 'readline' &> /dev/null && brew install 'readline'
     ! echo "${installed}" | grep -w 'redir' &> /dev/null && brew install 'redir'
