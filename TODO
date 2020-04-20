@@ -17,3 +17,5 @@
 - options to opt-out phases
 - https://serverfault.com/a/663048
 - skip and show warnings to formulas that does not exist anymore
+- LOG file does not work
+	- should print the LOG file location even it exit unexpectedly
