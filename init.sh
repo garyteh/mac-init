@@ -25,7 +25,7 @@ stderr() {
 install_homebrew() {
     if ! which brew &> /dev/null; then
         echo "Installing Homebrew..."
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)" > "${LOG_FILE}"
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)" &> "${LOG_FILE}"
     fi
 }
 
@@ -245,7 +245,7 @@ install_homebrew_formulas() {
 'zlib' \
 'zsh-autosuggestions' \
 'zsh-completions' \
-'zstd' > "${LOG_FILE}"
+'zstd' &> "${LOG_FILE}"
 }
 
 install_homebrew_cask() {
@@ -261,7 +261,7 @@ install_homebrew_cask() {
 'iterm2' \
 'spotify' \
 'sublime-text' \
-'whatsapp' > "${LOG_FILE}"
+'whatsapp' &> "${LOG_FILE}"
 }
 
 init_macos() {
@@ -302,12 +302,12 @@ setup_default_shell() {
 install_powerline_go() {
     if [[ ! -a "${HOME}/.go/bin/powerline-go" ]]; then
         echo "Installing powerline-go..."
-        GOPATH="${HOME}/.go/" go install github.com/justjanne/powerline-go@latest > "${LOG_FILE}"
+        GOPATH="${HOME}/.go/" go install github.com/justjanne/powerline-go@latest &> "${LOG_FILE}"
     fi
     if ! ls "${HOME}/Library/Fonts" | grep -iw powerline &> /dev/null; then
         echo "Installing powerline-fonts..."
-        git clone https://github.com/powerline/fonts.git "${WORKDIR}/fonts" > "${LOG_FILE}"
-        "${WORKDIR}/fonts/install.sh" > "${LOG_FILE}"
+        git clone https://github.com/powerline/fonts.git "${WORKDIR}/fonts" &> "${LOG_FILE}"
+        "${WORKDIR}/fonts/install.sh" &> "${LOG_FILE}"
     fi
 }
 
