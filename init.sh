@@ -6,17 +6,6 @@ IFS=$'\n\t'
 workdir=$(mktemp -d)
 log_file="${workdir}/init.log.$(date +%F%T%Z)"
 
-install_xcode_command_line_tool() {
-    local product_name
-
-    if [[ ! -e "/Library/Developer/CommandLineTools/usr/bin/git" ]]; then
-        echo "Installing Xcode Command Line Tool..."
-        touch "/tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress"
-        product_name=$(softwareupdate -l | grep "\*.*Command Line" | head -n 1 | awk -F"*" '{print $2}' | sed -e 's/^ *//' | tr -d '\n')
-        softwareupdate -i "${product_name}"
-    fi
-}
-
 install_homebrew() {
     if ! which brew &> /dev/null; then
         echo "Installing Homebrew..."
@@ -187,7 +176,6 @@ install_pip() {
     pip install psutil
 }
 
-install_xcode_command_line_tool
 install_homebrew
 install_homebrew_formulas
 # install_homebrew_cask
