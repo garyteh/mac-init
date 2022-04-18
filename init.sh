@@ -5,6 +5,12 @@ IFS=$'\n\t'
 
 WORKDIR=$(mktemp -d)
 LOG_FILE="${WORKDIR}/init.log.$(date +%F%T%Z)"
+ECHO_PATH=$(which echo)
+
+function echo() {
+    $ECHO_PATH "$@"
+    $ECHO_PATH "$@" > "$LOG_FILE"
+}
 
 install_homebrew() {
     if ! which brew &> /dev/null; then
