@@ -239,24 +239,19 @@ install_homebrew_formulas() {
 }
 
 install_homebrew_cask() {
-    local installed=$(brew cask ls -1)
-
     echo "Installing Homebrew casks..."
-    ! echo "${installed}" | grep -w 'google-chrome' &> /dev/null && brew cask install 'google-chrome'
-    ! echo "${installed}" | grep -w 'android-file-transfer' &> /dev/null && brew cask install 'android-file-transfer'
-    ! echo "${installed}" | grep -w 'appcleaner' &> /dev/null && brew cask install 'appcleaner'
-    ! echo "${installed}" | grep -w 'authy' &> /dev/null && brew cask install 'authy'
-    ! echo "${installed}" | grep -w 'docker' &> /dev/null && brew cask install 'docker'
-    ! echo "${installed}" | grep -w 'dropbox' &> /dev/null && brew cask install 'dropbox'
-    ! echo "${installed}" | grep -w 'fluor' &> /dev/null && brew cask install 'fluor'
-    ! echo "${installed}" | grep -w 'iina' &> /dev/null && brew cask install 'iina'
-    ! echo "${installed}" | grep -w 'iterm2' &> /dev/null && brew cask install 'iterm2'
-    ! echo "${installed}" | grep -w 'lastpass' &> /dev/null && brew cask install 'lastpass'
-    ! echo "${installed}" | grep -w 'spotify' &> /dev/null && brew cask install 'spotify'
-    ! echo "${installed}" | grep -w 'sublime-text' &> /dev/null && brew cask install 'sublime-text'
-    ! echo "${installed}" | grep -w 'visual-studio-code' &> /dev/null && brew cask install 'visual-studio-code'
-    ! echo "${installed}" | grep -w 'intellij-idea' &> /dev/null && brew cask install 'intellij-idea'
-    ! echo "${installed}" | grep -w 'whatsapp' &> /dev/null && brew cask install 'whatsapp'
+    brew install --cask 'android-file-transfer' \
+'appcleaner' \
+'authy' \
+'docker' \
+'dropbox' \
+'fluor' \
+'google-chrome' \
+'iina' \
+'iterm2' \
+'spotify' \
+'sublime-text' \
+'whatsapp' > "${LOG_FILE}"
 }
 
 init_macos() {
