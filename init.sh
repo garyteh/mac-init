@@ -283,24 +283,37 @@ init_macos() {
 }
 
 setup_default_shell() {
-    local file="/etc/shells" path="/usr/local/bin/bash"
+    local file="/etc/shells" exe_path="/usr/local/bin/bash"
 
-    if [[ -a "$path" ]]; then
-        if ! cat "${file}" | grep -E "^${path}\$" &> /dev/null; then
+    if [[ -a "${exe_path}" ]]; then
+        if ! cat "${file}" | grep -E "^${exe_path}\$" &> /dev/null; then
             echo "Updating ${file}..."
-            $ECHO_PATH "${path}" | sudo tee -a "${file}"
+            $ECHO_PATH "${exe_path}" | sudo tee -a "${file}"
         fi
-        if ! echo "$SHELL" | grep "${path}" &> /dev/null; then
-            echo "Set default shell as ${path}..."
-            chsh -s "${path}"
+        if ! echo "$SHELL" | grep "${exe_path}" &> /dev/null; then
+            echo "Set default shell as ${exe_path}..."
+            chsh -s "${exe_path}"
         fi
     else
-        stderr "$path not found..."
+        stderr "${exe_path} not found..."
+    fi
+}
+
+install_powerline_go() {
+    if [[ ! -a "${HOME}/.go/bin/powerline-go" ]]; then
+        echo "Installing powerline-go..."
+        GOPATH="${HOME}/.go/" go install github.com/justjanne/powerline-go@latest > "${LOG_FILE}"
+    fi
+    if ! ls "${HOME}/Library/Fonts" | grep -iw powerline &> /dev/null; then
+        echo "Installing powerline-fonts..."
+        git clone https://github.com/powerline/fonts.git "${WORKDIR}/fonts" > "${LOG_FILE}"
+        "${WORKDIR}/fonts/install.sh" > "${LOG_FILE}"
     fi
 }
 
 post_brew_formulas() {
     setup_default_shell
+    install_powerline_go
 }
 
 install_homebrew
