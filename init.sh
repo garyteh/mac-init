@@ -3,8 +3,8 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-workdir=$(mktemp -d)
-log_file="${workdir}/init.log.$(date +%F%T%Z)"
+WORKDIR=$(mktemp -d)
+LOG_FILE="${WORKDIR}/init.log.$(date +%F%T%Z)"
 
 install_homebrew() {
     if ! which brew &> /dev/null; then
