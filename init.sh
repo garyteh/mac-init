@@ -6,10 +6,18 @@ IFS=$'\n\t'
 WORKDIR=$(mktemp -d)
 LOG_FILE="${WORKDIR}/init.log.$(date +%F%T%Z)"
 ECHO_PATH=$(which echo)
+RED='\033[0;31m'
+NC='\033[0m'
 
-function echo() {
+echo() {
     $ECHO_PATH "$@"
     $ECHO_PATH "$@" > "$LOG_FILE"
+}
+
+stderr() {
+    $ECHO_PATH "$@" > "$LOG_FILE"
+    >&2 $ECHO_PATH -e "${RED}${@}${NC}"
+    return 1
 }
 
 install_homebrew() {
@@ -272,7 +280,29 @@ init_macos() {
     defaults write NSGlobalDomain AppleShowAllExtensions -bool true
 }
 
+setup_default_shell() {
+    local file="/etc/shells" path="/usr/local/bin/bash1"
+
+    if [[ -a "$path" ]]; then
+        if ! cat "${file}" | grep -E "^${path}\$" &> /dev/null; then
+            echo "Updating ${file}..."
+            $ECHO_PATH "${path}" | sudo tee -a "${file}"
+        fi
+        if ! echo "$SHELL" | grep "${path}" &> /dev/null; then
+            echo "Set default shell as ${path}..."
+            chsh -s "${path}"
+        fi
+    else
+        stderr "$path not found..."
+    fi
+}
+
+post_brew_formulas() {
+    setup_default_shell
+}
+
 install_homebrew
 install_homebrew_formulas
-# install_homebrew_cask
+install_homebrew_cask
+post_brew_formulas
 # init_macos
