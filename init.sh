@@ -5,31 +5,6 @@ IFS=$'\n\t'
 
 workdir=$(mktemp -d)
 log_file="${workdir}/init.log.$(date +%F%T%Z)"
-exec 19>>"${log_file}"
-export BASH_XTRACEFD="19"
-
-set -x
-
-__debug() {
-    [[ ! -z "${current_command+x}" ]] && last_command=${current_command}
-    current_command=${BASH_COMMAND}
-}
-trap __debug DEBUG
-
-__exit() {
-    last_command_exit_code=$?
-    if [[ ${last_command_exit_code} -ne 0 ]] && [[ ${last_command_exit_code} -ne 130 ]]; then
-        echo "ERROR (${last_command_exit_code}): ${last_command}"
-    fi
-}
-trap __exit EXIT
-
-__sigint() {
-    echo
-    printf "%-30s: %-10s\n" "Last command" "${last_command}"
-    exit 130
-}
-trap __sigint SIGINT
 
 install_xcode_command_line_tool() {
     local product_name
@@ -212,7 +187,6 @@ install_pip() {
     pip install psutil
 }
 
-echo "Log @ ${log_file}"
 install_xcode_command_line_tool
 install_homebrew
 install_homebrew_formulas
