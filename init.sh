@@ -283,7 +283,7 @@ init_macos() {
 }
 
 setup_default_shell() {
-    local file="/etc/shells" path="/usr/local/bin/bash1"
+    local file="/etc/shells" path="/usr/local/bin/bash"
 
     if [[ -a "$path" ]]; then
         if ! cat "${file}" | grep -E "^${path}\$" &> /dev/null; then
