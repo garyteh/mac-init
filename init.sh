@@ -23,9 +23,23 @@ stderr() {
 }
 
 install_homebrew() {
+    local homebrew_prefix 
+
     if ! which brew &> /dev/null; then
         echo "Installing Homebrew..."
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)" &> "${LOG_FILE}"
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" &> "${LOG_FILE}"
+    fi
+    if [[ "${UNAME_MACHINE}" == "arm64" ]]; then
+        # On ARM macOS, this script installs to /opt/homebrew only
+        homebrew_prefix="/opt/homebrew"
+    else
+        # On Intel macOS, this script installs to /usr/local only
+        homebrew_prefix="/usr/local"
+    fi
+    if ! [[ -x "$(command -v brew)" ]]; then
+        eval "\$(${homebrew_prefix}/bin/brew shellenv)"
+    else
+        stderr "brew: command not found. The installation went wrong."
     fi
 }
 
