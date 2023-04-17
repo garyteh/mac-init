@@ -3,13 +3,14 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-WORKDIR=$(mktemp -d)
+WORKDIR="${HOME}/.logs"
 LOG_FILE="${WORKDIR}/init.log.$(date +%F%T%Z)"
 ECHO_PATH=$(which echo)
 RED='\033[0;31m'
 NC='\033[0m'
 
-echo "Log: ${LOG_FILE}"
+mkdir -p $WORKDIR
+echo "Log file created @ ${LOG_FILE}"
 
 echo() {
     $ECHO_PATH "$@"
