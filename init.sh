@@ -28,7 +28,7 @@ install_homebrew() {
 
     if ! which brew &> /dev/null; then
         echo "Installing Homebrew..."
-        echo | /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" &> "${LOG_FILE}"
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" &> "${LOG_FILE}"
     fi
     if [[ "${UNAME_MACHINE}" == "arm64" ]]; then
         # On ARM macOS, this script installs to /opt/homebrew only
