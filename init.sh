@@ -305,18 +305,24 @@ install_homebrew_formulas() {
 
 install_homebrew_cask() {
     echo "Installing Homebrew casks..."
-    brew install --cask 'android-file-transfer' \
+    brew install --cask \
+'alfred' \
 'appcleaner' \
 'authy' \
+'corretto17' \
 'docker' \
-'dropbox' \
 'fluor' \
-'google-chrome' \
-'iina' \
+'gpg-suite-nightly' \
 'iterm2' \
+'launchcontrol' \
+'muzzle' \
+'ngrok' \
 'spotify' \
+'sublime-merge' \
 'sublime-text' \
-'whatsapp' &> "${LOG_FILE}"
+'temurin11' \
+'temurin8' \
+'visual-studio-code' &> "${LOG_FILE}"
 }
 
 init_macos() {
