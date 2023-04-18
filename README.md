@@ -1,5 +1,3 @@
 # http://stackoverflow.com/questions/5735666/execute-bash-script-from-url
-bash <(curl -s https://raw.githubusercontent.com/garyteh/mac-init/master/init.sh)
-
-# http://stackoverflow.com/questions/4642915/passing-parameters-to-bash-when-executing-a-script-fetched-by-curl
-curl https://raw.githubusercontent.com/garyteh/mac-init/master/init.sh | bash -s arg1 arg2
+# https://stackoverflow.com/questions/692000/how-do-i-write-standard-error-to-a-file-while-using-tee-with-a-pipe
+bash <(curl -s https://raw.githubusercontent.com/garyteh/mac-init/master/init.sh) 2>&1 | tee -a "debug-$(date +%s).log"
