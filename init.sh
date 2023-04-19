@@ -58,14 +58,14 @@ while true; do
     kill -0 "$$" || exit
 done &> /dev/null &
 
-if [[ ! -z "${SKIP_INSTALL_HOMEBREW-}" ]]; then
+if [[ -z "${SKIP_INSTALL_HOMEBREW-}" ]]; then
     ohai "Installing Homebrew."
     NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 else
     warn "Skip installing homebrew."
 fi
 
-if [[ ! -z "${SKIP_INSTALL_HOMEBREW_DEPENDENCIES-}" ]]; then
+if [[ -z "${SKIP_INSTALL_HOMEBREW_DEPENDENCIES-}" ]]; then
     if [[ ! -x "$(command -v brew)" ]]; then
         ohai "Sourcing \`brew\` to current TTY."
         if [[ -x "/opt/homebrew/bin/brew" ]]; then
@@ -89,7 +89,7 @@ else
     warn "Skip installing Homebrew dependencies."
 fi
 
-if [[ ! -z "${SKIP_SETUP_DEFAULT_SHELL-}" ]]; then
+if [[ -z "${SKIP_SETUP_DEFAULT_SHELL-}" ]]; then
     shells_path="/etc/shells" 
     bash_exec_pathes=$(which -a bash | grep -vFx '/bin/bash')
 
@@ -112,7 +112,7 @@ else
     echo "Skip setting up default shell."
 fi
 
-if [[ ! -z "${SKIP_INSTALL_POWERLINE_GO-}" ]]; then
+if [[ -z "${SKIP_INSTALL_POWERLINE_GO-}" ]]; then
     if [[ ! -x "$(command -v go)" ]]; then
         abort "\`go\`: command not found. Try \`brew install go\`."
     fi
@@ -133,7 +133,7 @@ else
 fi
 
 # manage macOS preferences
-# if [[ ! -z "${SKIP_SETUP_MACOS_PREFERENCES-}" ]]; then
+# if [[ -z "${SKIP_SETUP_MACOS_PREFERENCES-}" ]]; then
 #     defaults write NSGlobalDomain KeyRepeat -int 2
 #     defaults write NSGlobalDomain InitialKeyRepeat -int 15
 #     defaults write NSGlobalDomain AppleInterfaceStyle -string Dark
@@ -153,7 +153,7 @@ fi
 #     echo "Skip setting up macOS preferences."
 # fi
 
-if [[ ! -z "${SKIP_CLONE_DOTFILES-}" ]]; then
+if [[ -z "${SKIP_CLONE_DOTFILES-}" ]]; then
     if [[ ! -x "$(command -v git)" ]]; then
         abort "\`git\`: command not found. Try \`brew install git\`."
     fi
