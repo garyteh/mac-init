@@ -109,7 +109,7 @@ Manual intervention required to update ${shells_path}."
         chsh -s "${bash_exec_pathes}"
     fi
 else
-    echo "Skip setting up default shell."
+    warn "Skip setting up default shell."
 fi
 
 if [[ -z "${SKIP_INSTALL_POWERLINE_GO-}" ]]; then
@@ -124,12 +124,12 @@ if [[ -z "${SKIP_INSTALL_POWERLINE_GO-}" ]]; then
         GOPATH="${HOME}/.go/" go install github.com/justjanne/powerline-go@latest
     fi
     if ! ls "${HOME}/Library/Fonts" | grep -iw powerline &> /dev/null; then
-        echo "Installing powerline-fonts."
+        ohai "Installing powerline-fonts."
         git clone https://github.com/powerline/fonts.git "${tmp_workdir}/fonts"
         "${tmp_workdir}/fonts/install.sh"
     fi
 else
-    echo "Skip installing powerline-go."
+    warn "Skip installing powerline-go."
 fi
 
 # manage macOS preferences
@@ -150,7 +150,7 @@ fi
 #     defaults write com.apple.HIToolbox AppleSelectedInputSources -array-add '<dict> <key>InputSourceKind</key> <string>Keyboard Layout</string> <key>KeyboardLayout ID</key> <integer>15</integer> <key>KeyboardLayout Name</key> <string>Australian</string> </dict>'
 #     defaults write NSGlobalDomain AppleShowAllExtensions -bool true
 # else
-#     echo "Skip setting up macOS preferences."
+#     warn "Skip setting up macOS preferences."
 # fi
 
 if [[ -z "${SKIP_CLONE_DOTFILES-}" ]]; then
