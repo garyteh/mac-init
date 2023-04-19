@@ -45,15 +45,18 @@ ohai() {
     printf "${tty_blue}==>${tty_bold} %s${tty_reset}\n" "$(shell_join "$@")"
 }
 
+ohai "Prevent the system from sleeping."
+caffeinate -i -w $$ &
+
 tmp_workdir=$(mktemp -d) || abort "Unable to create temporary work directory."
 
-ohai "Created a temporary directory @ ${tmp_workdir}."
+ohai "Temporary directory @ ${tmp_workdir}."
 ohai "Get ready to enter your password for super access."
 sudo -v
 
-warn "Keeping your sudo session active in background"
+warn "Keep your sudo session active in background."
 while true; do
-    sudo -n true
+    sudo -v
     sleep 60
     kill -0 "$$" || exit
 done &> /dev/null &
@@ -94,7 +97,7 @@ if [[ -z "${SKIP_SETUP_DEFAULT_SHELL-}" ]]; then
     bash_exec_pathes=$(which -a bash | grep -vFx '/bin/bash')
 
     if [[ $(echo "${bash_exec_pathes}" | wc -l) -eq 0 ]]; then
-        abort "No additional \`bash\` found. Try \`brew install bash\`."
+        abort "No additional \`bash\` found."
     elif [[ $(echo "${bash_exec_pathes}" | wc -l) -gt 1 ]]; then
         abort "Multiple \`bash\` found:
 ${bash_exec_pathes}
@@ -114,10 +117,10 @@ fi
 
 if [[ -z "${SKIP_INSTALL_POWERLINE_GO-}" ]]; then
     if [[ ! -x "$(command -v go)" ]]; then
-        abort "\`go\`: command not found. Try \`brew install go\`."
+        abort "\`go\`: command not found."
     fi
     if [[ ! -x "$(command -v git)" ]]; then
-        abort "\`git\`: command not found. Try \`brew install git\`."
+        abort "\`git\`: command not found."
     fi
     if [[ ! -x "${HOME}/.go/bin/powerline-go" ]]; then
         ohai "Installing powerline-go."
@@ -155,11 +158,20 @@ fi
 
 if [[ -z "${SKIP_CLONE_DOTFILES-}" ]]; then
     if [[ ! -x "$(command -v git)" ]]; then
-        abort "\`git\`: command not found. Try \`brew install git\`."
+        abort "\`git\`: command not found."
     fi
 
-    ohai "Cloning dotfiles to ${HOME}."
-    git clone --bare https://github.com/garyteh/mac-dotfiles.git "${HOME}/.cfg"
-    git --git-dir="${HOME}/.cfg/" --work-tree="${HOME}" checkout
-    git --git-dir="${HOME}/.cfg/" --work-tree="${HOME}" config --local status.showUntrackedFiles no
+    dotfile_repo="https://github.com/garyteh/mac-dotfiles.git"
+    dotfile_path="${tmp_workdir}/mac-dotfiles"
+
+    ohai "Cloning dotfiles to ${dotfile_path}."
+    git clone "${dotfile_repo}" "${dotfile_path}"
+    rm -rf "${dotfile_path}/.git"
+
+    ohai "Setting up dotfiles in ${HOME}."
+    cp -av "${dotfile_path}/." "${HOME}/"
+
+    home_dotfile_repo="${HOME}/.cfg/"
+    git clone --bare "${dotfile_repo}" "${home_dotfile_repo}"
+    git --git-dir="${home_dotfile_repo}" --work-tree="${HOME}" config --local status.showUntrackedFiles no
 fi 
