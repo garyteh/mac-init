@@ -169,9 +169,8 @@ if [[ -z "${SKIP_CLONE_DOTFILES-}" ]]; then
     rm -rf "${dotfile_path}/.git"
 
     ohai "Setting up dotfiles in ${HOME}."
-    cp -av "${dotfile_path}/." "${HOME}/"
-
     home_dotfile_repo="${HOME}/.cfg/"
     git clone --bare "${dotfile_repo}" "${home_dotfile_repo}"
     git --git-dir="${home_dotfile_repo}" --work-tree="${HOME}" config --local status.showUntrackedFiles no
+    cp -av "${dotfile_path}/." "${HOME}/"
 fi 
