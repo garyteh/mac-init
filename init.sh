@@ -80,7 +80,7 @@ if [[ -z "${SKIP_INSTALL_HOMEBREW_DEPENDENCIES-}" ]]; then
     fi
 
     ohai "Downloading Brewfile from GitHub."
-    brewfile_path="${WORKDIR}/Brewfile"
+    brewfile_path="${tmp_workdir}/Brewfile"
     curl -o "${brewfile_path}" https://raw.githubusercontent.com/garyteh/mac-init/master/Brewfile
 
     ohai "Installing all Homebrew dependencies."
