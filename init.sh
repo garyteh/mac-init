@@ -3,397 +3,163 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-WORKDIR="${HOME}/.logs"
-LOG_FILE="${WORKDIR}/init.log.$(date +%F%T%Z)"
-ECHO_PATH=$(which echo)
-RED='\033[0;31m'
-NC='\033[0m'
+if [[ -t 1 ]]; then
+    tty_escape() { printf "\033[%sm" "$1"; }
+else
+    tty_escape() { :; }
+fi
 
-mkdir -p $WORKDIR
-echo "Log file created @ ${LOG_FILE}"
+tty_mkbold() { tty_escape "1;$1"; }
+tty_underline="$(tty_escape "4;39")"
+tty_blue="$(tty_mkbold 34)"
+tty_red="$(tty_mkbold 31)"
+tty_yellow="$(tty_mkbold 33)"
+tty_bold="$(tty_mkbold 39)"
+tty_reset="$(tty_escape 0)"
 
-echo() {
-    $ECHO_PATH "$@"
-    $ECHO_PATH "$@" > "$LOG_FILE"
+shell_join() {
+    local arg
+    printf "%s" "$1"
+    shift
+    for arg in "$@"; do
+        printf " "
+        printf "%s" "${arg// /\ }"
+    done
 }
 
-stderr() {
-    $ECHO_PATH "$@" > "$LOG_FILE"
-    >&2 $ECHO_PATH -e "${RED}${@}${NC}"
-    return 1
+chomp() {
+    printf "%s" "${1/"$'\n'"/}"
 }
 
-install_homebrew() {
-    local homebrew_prefix 
-
-    if ! which brew &> /dev/null; then
-        echo "Installing Homebrew..."
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" &> "${LOG_FILE}"
-    fi
-    if [[ "${UNAME_MACHINE}" == "arm64" ]]; then
-        # On ARM macOS, this script installs to /opt/homebrew only
-        homebrew_prefix="/opt/homebrew"
-    else
-        # On Intel macOS, this script installs to /usr/local only
-        homebrew_prefix="/usr/local"
-    fi
-    if ! [[ -x "$(command -v brew)" ]]; then
-        eval "\$(${homebrew_prefix}/bin/brew shellenv)"
-    else
-        stderr "brew: command not found. The installation went wrong."
-    fi
+abort() {
+    printf "%s\n" "$@" >&2
+    printf "${tty_red}Error${tty_reset}: %s\n" "$(shell_join "$@")" >&2
+    exit 1
 }
 
-install_homebrew_formulas() {
-    echo "Installing Homebrew formulas..."
-    brew install \
-'ack' \
-'adns' \
-'aom' \
-'apr' \
-'apr-util' \
-'aribb24' \
-'autoconf' \
-'awscli' \
-'bash' \
-'bash-completion' \
-'bdw-gc' \
-'berkeley-db' \
-'binutils' \
-'blackbox' \
-'brotli' \
-'bzip2' \
-'c-ares' \
-'ca-certificates' \
-'cairo' \
-'cassandra' \
-'cjson' \
-'cloudflared' \
-'cmocka' \
-'coreutils' \
-'curl' \
-'cython' \
-'dav1d' \
-'diffutils' \
-'docker-compose' \
-'docutils' \
-'emacs' \
-'expect' \
-'fasd' \
-'ffmpeg' \
-'file-formula' \
-'findutils' \
-'flac' \
-'fontconfig' \
-'freetype' \
-'frei0r' \
-'fribidi' \
-'fzf' \
-'gawk' \
-'gd' \
-'gdbm' \
-'gdk-pixbuf' \
-'gettext' \
-'giflib' \
-'git' \
-'git-lfs' \
-'git-quick-stats' \
-'glib' \
-'glide' \
-'gmp' \
-'gnu-getopt' \
-'gnu-indent' \
-'gnu-sed' \
-'gnu-tar' \
-'gnu-time' \
-'gnu-which' \
-'gnupg' \
-'gnuplot' \
-'gnutls' \
-'go' \
-'gobject-introspection' \
-'gpatch' \
-'gradle' \
-'gradle-completion' \
-'graphite2' \
-'graphviz' \
-'grep' \
-'gts' \
-'guile' \
-'gzip' \
-'harfbuzz' \
-'helm' \
-'highway' \
-'htop' \
-'httpie' \
-'hub' \
-'icu4c' \
-'imath' \
-'jansson' \
-'jasper' \
-'jemalloc' \
-'jenv' \
-'jpeg' \
-'jpeg-turbo' \
-'jpeg-xl' \
-'jq' \
-'kubernetes-cli' \
-'lame' \
-'lastpass-cli' \
-'ldns' \
-'leptonica' \
-'less' \
-'libarchive' \
-'libass' \
-'libassuan' \
-'libavif' \
-'libb2' \
-'libbluray' \
-'libcbor' \
-'libcerf' \
-'libev' \
-'libevent' \
-'libffi' \
-'libfido2' \
-'libgcrypt' \
-'libgpg-error' \
-'libidn2' \
-'libksba' \
-'liblinear' \
-'libmagic' \
-'libnghttp2' \
-'libogg' \
-'libpng' \
-'libpthread-stubs' \
-'librist' \
-'librsvg' \
-'libsamplerate' \
-'libsndfile' \
-'libsodium' \
-'libsoxr' \
-'libssh2' \
-'libtasn1' \
-'libtiff' \
-'libtool' \
-'libunibreak' \
-'libunistring' \
-'libusb' \
-'libuv' \
-'libvidstab' \
-'libvmaf' \
-'libvorbis' \
-'libvpx' \
-'libx11' \
-'libxau' \
-'libxcb' \
-'libxdmcp' \
-'libxext' \
-'libxml2' \
-'libxmlsec1' \
-'libxrender' \
-'libyaml' \
-'libzip' \
-'little-cms2' \
-'lua' \
-'lua@5.1' \
-'lua@5.3' \
-'luarocks' \
-'lynx' \
-'lz4' \
-'lzip' \
-'lzo' \
-'m4' \
-'make' \
-'mbedtls' \
-'midnight-commander' \
-'moreutils' \
-'mpdecimal' \
-'mpfr' \
-'mpg123' \
-'mvnvm' \
-'mysql@5.6' \
-'nano' \
-'ncurses' \
-'netcat' \
-'netpbm' \
-'nettle' \
-'nghttp2' \
-'nmap' \
-'node' \
-'npth' \
-'nvm' \
-'oniguruma' \
-'opa' \
-'opencore-amr' \
-'openexr' \
-'openjdk' \
-'openjdk@11' \
-'openjdk@8' \
-'openjpeg' \
-'openldap' \
-'openssh' \
-'openssl@1.1' \
-'openssl@3' \
-'opus' \
-'p11-kit' \
-'pandoc' \
-'pango' \
-'parallel' \
-'pass' \
-'pcre' \
-'pcre2' \
-'perl' \
-'pinentry' \
-'pinentry-mac' \
-'pipx' \
-'pixman' \
-'pkg-config' \
-'popt' \
-'postgresql@9.5' \
-'protobuf' \
-'pv' \
-'pwgen' \
-'pyenv' \
-'pyenv-virtualenv' \
-'python@3.10' \
-'python@3.11' \
-'python@3.8' \
-'python@3.9' \
-'qrencode' \
-'qt@5' \
-'rav1e' \
-'rbenv' \
-'readline' \
-'redir' \
-'redis' \
-'rename' \
-'rsync' \
-'rtmpdump' \
-'rubberband' \
-'ruby' \
-'ruby-build' \
-'s-lang' \
-'screen' \
-'sdl2' \
-'shellcheck' \
-'six' \
-'sl' \
-'snappy' \
-'speex' \
-'sqlite' \
-'srt' \
-'subversion' \
-'svt-av1' \
-'tcl-tk' \
-'telnet' \
-'terraform' \
-'tesseract' \
-'thefuck' \
-'theora' \
-'tldr' \
-'tmux' \
-'tree' \
-'unbound' \
-'unzip' \
-'utf8proc' \
-'vim' \
-'watch' \
-'wdiff' \
-'webp' \
-'wget' \
-'x264' \
-'x265' \
-'xmlstarlet' \
-'xorgproto' \
-'xvid' \
-'xxhash' \
-'xz' \
-'yarn' \
-'yq' \
-'zeromq' \
-'zimg' \
-'zlib' \
-'zsh-autosuggestions' \
-'zsh-completions' \
-'zstd' &> "${LOG_FILE}"
+warn() {
+    printf "${tty_yellow}Warning${tty_reset}: %s\n" "$(chomp "$1")" >&2
 }
 
-install_homebrew_cask() {
-    echo "Installing Homebrew casks..."
-    brew install --cask \
-'alfred' \
-'appcleaner' \
-'authy' \
-'corretto17' \
-'docker' \
-'fluor' \
-'gpg-suite-nightly' \
-'iterm2' \
-'launchcontrol' \
-'muzzle' \
-'ngrok' \
-'spotify' \
-'sublime-merge' \
-'sublime-text' \
-'temurin11' \
-'temurin8' \
-'visual-studio-code' &> "${LOG_FILE}"
+ohai() {
+    printf "${tty_blue}==>${tty_bold} %s${tty_reset}\n" "$(shell_join "$@")"
 }
 
-init_macos() {
-    defaults write NSGlobalDomain KeyRepeat -int 2
-    defaults write NSGlobalDomain InitialKeyRepeat -int 15
-    defaults write NSGlobalDomain AppleInterfaceStyle -string Dark
-    defaults delete com.apple.HIToolbox AppleEnabledInputSources
-    defaults write com.apple.HIToolbox AppleEnabledInputSources -array-add '<dict> <key>InputSourceKind</key> <string>Keyboard Layout</string> <key>KeyboardLayout ID</key> <integer>15</integer> <key>KeyboardLayout Name</key> <string>Australian</string> </dict>'
-    defaults write com.apple.HIToolbox AppleEnabledInputSources -array-add '<dict> <key>Bundle ID</key> <string>com.apple.inputmethod.TCIM</string> <key>Input Mode</key> <string>com.apple.inputmethod.TCIM.Pinyin</string> <key>InputSourceKind</key> <string>Input Mode</string> </dict>'
-    defaults write com.apple.HIToolbox AppleEnabledInputSources -array-add '<dict> <key>Bundle ID</key> <string>com.apple.inputmethod.TCIM</string> <key>InputSourceKind</key> <string>Keyboard Input Method</string> </dict>'
-    defaults write com.apple.HIToolbox AppleEnabledInputSources -array-add '<dict> <key>Bundle ID</key> <string>com.apple.inputmethod.ChineseHandwriting</string> <key>InputSourceKind</key> <string>Non Keyboard Input Method</string> </dict>'    
-    defaults delete com.apple.HIToolbox AppleInputSourceHistory
-    defaults write com.apple.HIToolbox AppleInputSourceHistory -array-add '<dict> <key>InputSourceKind</key> <string>Keyboard Layout</string> <key>KeyboardLayout ID</key> <integer>15</integer> <key>KeyboardLayout Name</key> <string>Australian</string> </dict>'
-    defaults write com.apple.HIToolbox AppleInputSourceHistory -array-add '<dict> <key>Bundle ID</key> <string>com.apple.inputmethod.TCIM</string> <key>Input Mode</key> <string>com.apple.inputmethod.TCIM.Pinyin</string> <key>InputSourceKind</key> <string>Input Mode</string> </dict>'
-    defaults delete com.apple.HIToolbox AppleSelectedInputSources
-    defaults write com.apple.HIToolbox AppleSelectedInputSources -array-add '<dict> <key>Bundle ID</key> <string>com.apple.PressAndHold</string> <key>InputSourceKind</key> <string>Non Keyboard Input Method</string> </dict>'
-    defaults write com.apple.HIToolbox AppleSelectedInputSources -array-add '<dict> <key>InputSourceKind</key> <string>Keyboard Layout</string> <key>KeyboardLayout ID</key> <integer>15</integer> <key>KeyboardLayout Name</key> <string>Australian</string> </dict>'
-    defaults write NSGlobalDomain AppleShowAllExtensions -bool true
-}
+tmp_workdir=$(mktemp -d) || abort "Unable to create temporary work directory."
 
-setup_default_shell() {
-    local file="/etc/shells" exe_path="/usr/local/bin/bash"
+ohai "Created a temporary directory @ ${tmp_workdir}."
+ohai "Get ready to enter your password for super access."
+sudo -v
 
-    if [[ -a "${exe_path}" ]]; then
-        if ! cat "${file}" | grep -E "^${exe_path}\$" &> /dev/null; then
-            echo "Updating ${file}..."
-            $ECHO_PATH "${exe_path}" | sudo tee -a "${file}"
+warn "Keeping your sudo session active in background"
+while true; do
+    sudo -n true
+    sleep 60
+    kill -0 "$$" || exit
+done &> /dev/null &
+
+if [[ ! -z "${SKIP_INSTALL_HOMEBREW:-}" ]]; then
+    ohai "Installing Homebrew."
+    NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+else
+    warn "Skip installing homebrew."
+fi
+
+if [[ ! -z "${SKIP_INSTALL_HOMEBREW_DEPENDENCIES:-}" ]]; then
+    if [[ ! -x "$(command -v brew)" ]]; then
+        ohai "Sourcing \`brew\` to current TTY."
+        if [[ -x "/opt/homebrew/bin/brew" ]]; then
+            # On ARM macOS, this script installs to /opt/homebrew only
+            eval "$(/opt/homebrew/bin/brew shellenv)"
+        elif [[ -x "/usr/local/bin/brew" ]]; then
+            # On Intel macOS, this script installs to /usr/local only
+            eval "$(/usr/local/bin/brew shellenv)"
+        else
+            abort "Homebrew is not installed."
         fi
-        if ! echo "$SHELL" | grep "${exe_path}" &> /dev/null; then
-            echo "Set default shell as ${exe_path}..."
-            chsh -s "${exe_path}"
-        fi
-    else
-        stderr "${exe_path} not found..."
     fi
-}
 
-install_powerline_go() {
-    if [[ ! -a "${HOME}/.go/bin/powerline-go" ]]; then
-        echo "Installing powerline-go..."
-        GOPATH="${HOME}/.go/" go install github.com/justjanne/powerline-go@latest &> "${LOG_FILE}"
+    ohai "Downloading Brewfile from GitHub."
+    brewfile_path="${WORKDIR}/Brewfile"
+    curl -o "${brewfile_path}" https://raw.githubusercontent.com/garyteh/mac-init/master/Brewfile
+
+    ohai "Installing all Homebrew dependencies."
+    brew bundle install --file "${brewfile_path}" -v
+else
+    warn "Skip installing Homebrew dependencies."
+fi
+
+if [[ ! -z "${SKIP_SETUP_DEFAULT_SHELL:-}" ]]; then
+    shells_path="/etc/shells" 
+    bash_exec_pathes=$(which -a bash | grep -vFx '/bin/bash')
+
+    if [[ $(echo "${bash_exec_pathes}" | wc -l) -eq 0 ]]; then
+        abort "No additional \`bash\` found. Try \`brew install bash\`."
+    elif [[ $(echo "${bash_exec_pathes}" | wc -l) -gt 1 ]]; then
+        abort "Multiple \`bash\` found:
+${bash_exec_pathes}
+Manual intervention required to update ${shells_path}."
+    fi
+    if ! cat "${shells_path}" | grep -Fx "${bash_exec_pathes}" &> /dev/null; then
+        ohai "Adding ${bash_exec_pathes} to ${shells_path}."
+        echo "${bash_exec_pathes}" | sudo tee -a "${shells_path}"
+    fi
+    if ! echo "$SHELL" | grep "${bash_exec_pathes}" &> /dev/null; then
+        ohai "Setting default shell as ${bash_exec_pathes}."
+        chsh -s "${bash_exec_pathes}"
+    fi
+else
+    echo "Skip setting up default shell."
+fi
+
+if [[ ! -z "${SKIP_INSTALL_POWERLINE_GO:-}" ]]; then
+    if [[ ! -x "$(command -v go)" ]]; then
+        abort "\`go\`: command not found. Try \`brew install go\`."
+    fi
+    if [[ ! -x "$(command -v git)" ]]; then
+        abort "\`git\`: command not found. Try \`brew install git\`."
+    fi
+    if [[ ! -x "${HOME}/.go/bin/powerline-go" ]]; then
+        ohai "Installing powerline-go."
+        GOPATH="${HOME}/.go/" go install github.com/justjanne/powerline-go@latest
     fi
     if ! ls "${HOME}/Library/Fonts" | grep -iw powerline &> /dev/null; then
-        echo "Installing powerline-fonts..."
-        git clone https://github.com/powerline/fonts.git "${WORKDIR}/fonts" &> "${LOG_FILE}"
-        "${WORKDIR}/fonts/install.sh" &> "${LOG_FILE}"
+        echo "Installing powerline-fonts."
+        git clone https://github.com/powerline/fonts.git "${tmp_workdir}/fonts"
+        "${tmp_workdir}/fonts/install.sh"
     fi
-}
+else
+    echo "Skip installing powerline-go."
+fi
 
-post_brew_formulas() {
-    setup_default_shell
-    install_powerline_go
-}
+# manage macOS preferences
+# if [[ ! -z "${SKIP_SETUP_MACOS_PREFERENCES:-}" ]]; then
+#     defaults write NSGlobalDomain KeyRepeat -int 2
+#     defaults write NSGlobalDomain InitialKeyRepeat -int 15
+#     defaults write NSGlobalDomain AppleInterfaceStyle -string Dark
+#     defaults delete com.apple.HIToolbox AppleEnabledInputSources
+#     defaults write com.apple.HIToolbox AppleEnabledInputSources -array-add '<dict> <key>InputSourceKind</key> <string>Keyboard Layout</string> <key>KeyboardLayout ID</key> <integer>15</integer> <key>KeyboardLayout Name</key> <string>Australian</string> </dict>'
+#     defaults write com.apple.HIToolbox AppleEnabledInputSources -array-add '<dict> <key>Bundle ID</key> <string>com.apple.inputmethod.TCIM</string> <key>Input Mode</key> <string>com.apple.inputmethod.TCIM.Pinyin</string> <key>InputSourceKind</key> <string>Input Mode</string> </dict>'
+#     defaults write com.apple.HIToolbox AppleEnabledInputSources -array-add '<dict> <key>Bundle ID</key> <string>com.apple.inputmethod.TCIM</string> <key>InputSourceKind</key> <string>Keyboard Input Method</string> </dict>'
+#     defaults write com.apple.HIToolbox AppleEnabledInputSources -array-add '<dict> <key>Bundle ID</key> <string>com.apple.inputmethod.ChineseHandwriting</string> <key>InputSourceKind</key> <string>Non Keyboard Input Method</string> </dict>'    
+#     defaults delete com.apple.HIToolbox AppleInputSourceHistory
+#     defaults write com.apple.HIToolbox AppleInputSourceHistory -array-add '<dict> <key>InputSourceKind</key> <string>Keyboard Layout</string> <key>KeyboardLayout ID</key> <integer>15</integer> <key>KeyboardLayout Name</key> <string>Australian</string> </dict>'
+#     defaults write com.apple.HIToolbox AppleInputSourceHistory -array-add '<dict> <key>Bundle ID</key> <string>com.apple.inputmethod.TCIM</string> <key>Input Mode</key> <string>com.apple.inputmethod.TCIM.Pinyin</string> <key>InputSourceKind</key> <string>Input Mode</string> </dict>'
+#     defaults delete com.apple.HIToolbox AppleSelectedInputSources
+#     defaults write com.apple.HIToolbox AppleSelectedInputSources -array-add '<dict> <key>Bundle ID</key> <string>com.apple.PressAndHold</string> <key>InputSourceKind</key> <string>Non Keyboard Input Method</string> </dict>'
+#     defaults write com.apple.HIToolbox AppleSelectedInputSources -array-add '<dict> <key>InputSourceKind</key> <string>Keyboard Layout</string> <key>KeyboardLayout ID</key> <integer>15</integer> <key>KeyboardLayout Name</key> <string>Australian</string> </dict>'
+#     defaults write NSGlobalDomain AppleShowAllExtensions -bool true
+# else
+#     echo "Skip setting up macOS preferences."
+# fi
 
-install_homebrew
-install_homebrew_formulas
-install_homebrew_cask
-post_brew_formulas
-# init_macos
+if [[ ! -z "${SKIP_CLONE_DOTFILES:-}" ]]; then
+    if [[ ! -x "$(command -v git)" ]]; then
+        abort "\`git\`: command not found. Try \`brew install git\`."
+    fi
+    
+    ohai "Cloning dotfiles to ${HOME}."
+    git clone --bare https://github.com/garyteh/mac-dotfiles.git "${HOME}/.cfg"
+    git --git-dir="${HOME}/.cfg/" --work-tree="${HOME}" checkout
+    git --git-dir="${HOME}/.cfg/" --work-tree="${HOME}" config --local status.showUntrackedFiles no
+fi 
