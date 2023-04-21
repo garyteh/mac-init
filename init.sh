@@ -71,12 +71,16 @@ fi
 if [[ -z "${SKIP_INSTALL_HOMEBREW_DEPENDENCIES-}" ]]; then
     if [[ ! -x "$(command -v brew)" ]]; then
         ohai "Sourcing \`brew\` to current TTY."
-        if [[ -x "/opt/homebrew/bin/brew" ]]; then
+
+        if [[ "$(/usr/bin/uname -m)" == "arm64" ]]; then
             # On ARM macOS, this script installs to /opt/homebrew only
-            eval "$(/opt/homebrew/bin/brew shellenv)"
-        elif [[ -x "/usr/local/bin/brew" ]]; then
+            homebrew_prefix="/opt/homebrew"
+        else
             # On Intel macOS, this script installs to /usr/local only
-            eval "$(/usr/local/bin/brew shellenv)"
+            homebrew_prefix="/usr/local"
+        fi
+        if [[ -x "${homebrew_prefix}/bin/brew" ]]; then
+            eval "$(${homebrew_prefix}/bin/brew shellenv)"
         else
             abort "Homebrew is not installed."
         fi
