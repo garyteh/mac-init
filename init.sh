@@ -139,11 +139,38 @@ else
     warn "Skip installing powerline-go."
 fi
 
-# manage macOS preferences
-# if [[ -z "${SKIP_SETUP_MACOS_PREFERENCES-}" ]]; then
-#     defaults write NSGlobalDomain KeyRepeat -int 2
-#     defaults write NSGlobalDomain InitialKeyRepeat -int 15
-#     defaults write NSGlobalDomain AppleInterfaceStyle -string Dark
+if [[ -z "${SKIP_SETUP_MACOS_PREFERENCES-}" ]]; then
+    # Dock - https://macos-defaults.com/dock/
+    ohai "Setting up macOS dock"
+    defaults write com.apple.dock "orientation" -string "left"
+    defaults write com.apple.dock "tilesize" -int "36"
+
+    # Screenshots - https://macos-defaults.com/screenshots/
+    ohai "Setting up macOS screen shots"
+    defaults write com.apple.screencapture "disable-shadow" -bool "true" 
+    defaults write com.apple.screencapture "location" -string "~/Pictures"
+
+    # Finder - https://macos-defaults.com/finder/
+    ohai "Setting up macOS Finder"
+    defaults write NSGlobalDomain "AppleShowAllExtensions" -bool "true"
+    defaults write com.apple.finder "ShowPathbar" -bool "true"
+    defaults write com.apple.finder "FXPreferredViewStyle" -string "Nlsv" 
+    defaults write com.apple.finder "_FXSortFoldersFirst" -bool "true"
+    defaults write com.apple.finder "FXDefaultSearchScope" -string "SCcf"
+    defaults write com.apple.finder "FXRemoveOldTrashItems" -bool "true"
+    defaults write NSGlobalDomain "NSDocumentSaveNewDocumentsToCloud" -bool "false" 
+
+    # Desktop - https://macos-defaults.com/desktop/
+    defaults write com.apple.finder "_FXSortFoldersFirstOnDesktop" -bool "true"
+    defaults write com.apple.finder "ShowHardDrivesOnDesktop" -bool "true"
+    defaults write com.apple.finder "ShowMountedServersOnDesktop" -bool "true"
+
+    # Keyboard
+    ohai "Setting up macOS keyboard"
+    defaults write NSGlobalDomain "ApplePressAndHoldEnabled" -bool "false" 
+    defaults write NSGlobalDomain KeyRepeat -int 2
+    defaults write NSGlobalDomain InitialKeyRepeat -int 15
+    defaults write NSGlobalDomain AppleInterfaceStyle -string Dark
 #     defaults delete com.apple.HIToolbox AppleEnabledInputSources
 #     defaults write com.apple.HIToolbox AppleEnabledInputSources -array-add '<dict> <key>InputSourceKind</key> <string>Keyboard Layout</string> <key>KeyboardLayout ID</key> <integer>15</integer> <key>KeyboardLayout Name</key> <string>Australian</string> </dict>'
 #     defaults write com.apple.HIToolbox AppleEnabledInputSources -array-add '<dict> <key>Bundle ID</key> <string>com.apple.inputmethod.TCIM</string> <key>Input Mode</key> <string>com.apple.inputmethod.TCIM.Pinyin</string> <key>InputSourceKind</key> <string>Input Mode</string> </dict>'
@@ -155,10 +182,17 @@ fi
 #     defaults delete com.apple.HIToolbox AppleSelectedInputSources
 #     defaults write com.apple.HIToolbox AppleSelectedInputSources -array-add '<dict> <key>Bundle ID</key> <string>com.apple.PressAndHold</string> <key>InputSourceKind</key> <string>Non Keyboard Input Method</string> </dict>'
 #     defaults write com.apple.HIToolbox AppleSelectedInputSources -array-add '<dict> <key>InputSourceKind</key> <string>Keyboard Layout</string> <key>KeyboardLayout ID</key> <integer>15</integer> <key>KeyboardLayout Name</key> <string>Australian</string> </dict>'
-#     defaults write NSGlobalDomain AppleShowAllExtensions -bool true
-# else
-#     warn "Skip setting up macOS preferences."
-# fi
+
+    # Misc - https://macos-defaults.com/misc/
+    ohai "Setting up macOS other preferences"
+    defaults write com.apple.LaunchServices "LSQuarantine" -bool "false"
+
+    killall Finder
+    killall Dock
+    killall SystemUIServer
+else
+    warn "Skip setting up macOS preferences."
+fi
 
 if [[ -z "${SKIP_CLONE_DOTFILES-}" ]]; then
     if [[ ! -x "$(command -v git)" ]]; then
