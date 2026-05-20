@@ -194,6 +194,18 @@ else
     warn "Skip setting up macOS preferences."
 fi
 
+# Setup default text editor
+duti -s com.sublimetext.4 txt all
+duti -s com.sublimetext.4 md all
+duti -s com.sublimetext.4 json all
+duti -s com.sublimetext.4 yaml all
+duti -s com.sublimetext.4 yml all
+duti -s com.sublimetext.4 xml all
+duti -s com.sublimetext.4 csv all
+duti -s com.sublimetext.4 log all
+duti -s com.sublimetext.4 sh all
+duti -s com.sublimetext.4 py all
+
 if [[ -z "${SKIP_CLONE_DOTFILES-}" ]]; then
     if [[ ! -x "$(command -v git)" ]]; then
         abort "\`git\`: command not found."
